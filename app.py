@@ -389,7 +389,15 @@ def main():
             st.markdown("<h2 style='text-align: center;'>Redirecting to long URL...</h2>", unsafe_allow_html=True)
             
             # Add the actual redirection
-            st.markdown(f'<meta http-equiv="refresh" content="1;URL=\'{original_url}\'">', unsafe_allow_html=True)
+            st.markdown(f"""
+    <script>
+        window.location.href = "{original_url}";
+    </script>
+    <noscript>
+        <meta http-equiv="refresh" content="0; URL='{original_url}'">
+    </noscript>
+""", unsafe_allow_html=True)
+
             
             # Add a fallback link
             st.markdown(f"<div style='text-align: center;'><a href='{original_url}'>Click here if not redirected automatically</a></div>", unsafe_allow_html=True)
