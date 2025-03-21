@@ -12,7 +12,7 @@ import base64
 
 def get_base_url():
     # Always use localhost:8501
-    return "http://localhost:8501/"
+    return "https://hvtbvajbmuylkbhgrnpo4k.streamlit.app"
 
 # Use localhost:8501 as the base URL
 base_url = get_base_url()
