@@ -345,9 +345,6 @@ def add_copy_script():
 
 # Main Streamlit app
 def main():
-    # Import streamlit components for redirect functionality
-    import streamlit.components.v1 as components
-    
     # Check for redirection first before setting up the main app
     # Get query parameters using the new API
     query_params = st.query_params
@@ -377,28 +374,27 @@ def main():
                 initial_sidebar_state="collapsed"
             )
             
-            # This is the key change: Using Streamlit native redirect
-            # Create a complete HTML page that performs the redirect
-            redirect_html = f"""
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Redirecting...</title>
-                    <meta http-equiv="refresh" content="0;url={original_url}">
-                    <script>
-                        window.location.href = "{original_url}";
-                    </script>
-                </head>
-                <body>
-                    <p>Redirecting to: <a href="{original_url}">{original_url}</a></p>
-                </body>
-                </html>
-            """
+            # Hide all other elements
+            st.markdown("""
+                <style>
+                    #MainMenu {visibility: hidden;}
+                    footer {visibility: hidden;}
+                    .stTabs {display: none;}
+                    header {visibility: hidden;}
+                    .block-container {padding-top: 2rem;}
+                </style>
+            """, unsafe_allow_html=True)
             
-            # Use components.html to handle the redirect - this replaces the entire Streamlit app with our HTML
-            components.html(redirect_html, width=None, height=None, scrolling=False)
+            # Show only the redirection message
+            st.markdown("<h2 style='text-align: center;'>Redirecting to long URL...</h2>", unsafe_allow_html=True)
             
-            # We return early to prevent the rest of the app from loading
+            # Add the actual redirection
+            st.markdown(f'<meta http-equiv="refresh" content="1;URL=\'{original_url}\'">', unsafe_allow_html=True)
+            
+            # Add a fallback link
+            st.markdown(f"<div style='text-align: center;'><a href='{original_url}'>Click here if not redirected automatically</a></div>", unsafe_allow_html=True)
+            
+            # Exit function to prevent the rest of the app from loading
             return
     
     # If we get here, this is not a redirection, so set up the main app
