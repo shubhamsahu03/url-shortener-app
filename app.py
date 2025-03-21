@@ -391,9 +391,7 @@ def main():
             # Add the actual redirection
             st.markdown(f"""
     <script>
-        setTimeout(function() {{
-            window.location.href = "{original_url}";
-        }}, 1000);
+        window.location.replace("{original_url}");
     </script>
     <noscript>
         <meta http-equiv="refresh" content="1; URL='{original_url}'">
