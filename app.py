@@ -344,10 +344,12 @@ def add_copy_script():
     """, unsafe_allow_html=True)
 
 # Main Streamlit app
-# Main Streamlit app
 def main():
+    # Initialize database regardless to ensure it exists
+    init_db()
+    
     # Check for redirection first before setting up the main app
-    # Get query parameters using the new API
+    # Get query parameters using the query_params API
     query_params = st.query_params
     
     # Check for code parameter - if present, handle redirection before setting up the main app
@@ -389,40 +391,28 @@ def main():
             # Show only the redirection message
             st.markdown("<h2 style='text-align: center;'>Redirecting to long URL...</h2>", unsafe_allow_html=True)
             
-            # Add the improved redirection with error handling, timeout, and analytics consideration
+            # FIXED REDIRECTION METHOD: Use multiple methods for better compatibility
+            # Method 1: HTML Meta Refresh (works in most browsers)
+            st.markdown(f'<meta http-equiv="refresh" content="0;URL=\'{original_url}\'">', unsafe_allow_html=True)
+            
+            # Method 2: JavaScript redirection backup with simpler approach
             st.markdown(f"""
-    <script>
-        // Capture analytics event if needed (example placeholder)
-        function logRedirect() {{
-            console.log("Redirect logged");
-            // Add your analytics code here if needed
-            return true;
-        }}
-        
-        // Execute redirect with short timeout to allow analytics
-        try {{
-            logRedirect();
-            setTimeout(function() {{
-                try {{
-                    window.location.replace("{original_url}");
-                }} catch (e) {{
-                    console.error("Redirection failed:", e);
-                    // Fallback to basic approach if replace fails
-                    window.location.href = "{original_url}";
-                }}
-            }}, 100); // Short delay for analytics
-        }} catch (e) {{
-            // Final fallback
-            window.location.href = "{original_url}";
-        }}
-    </script>
-    <noscript>
-        <meta http-equiv="refresh" content="1; URL='{original_url}'">
-    </noscript>
-""", unsafe_allow_html=True)
+            <script>
+                // Simple redirection approach for better compatibility
+                window.location.href = "{original_url}";
+            </script>
+            """, unsafe_allow_html=True)
             
             # Add a fallback link
-            st.markdown(f"<div style='text-align: center;'><a href='{original_url}'>Click here if not redirected automatically</a></div>", unsafe_allow_html=True)
+            st.markdown(f"""
+            <div style='text-align: center; margin-top: 20px;'>
+                <p>If not redirected automatically, click the link below:</p>
+                <a href='{original_url}' style='display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 4px; margin-top: 10px;'>Go to destination</a>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Method 3: Streamlit direct display of URL for user awareness
+            st.write(f"Destination: {original_url}")
             
             # Exit function to prevent the rest of the app from loading
             return
@@ -441,9 +431,6 @@ def main():
     # Add JavaScript for copy functionality
     add_copy_script()
     
-    # Initialize database
-    init_db()
-    
     # Sidebar for app info and options
     with st.sidebar:
         st.title("🔗 URL Shortener")
@@ -458,7 +445,7 @@ def main():
         - Generate QR codes for your links
         """)
         
-        # Using localhost:8501
+        # Using base_url
         st.info(f"Using domain: {base_url}")
         
     # Define tabs for different functionalities
@@ -705,5 +692,6 @@ def main():
                 st.info("No URLs to manage")
         elif admin_password:
             st.error("Incorrect password")
+
 if __name__ == "__main__":
     main()
