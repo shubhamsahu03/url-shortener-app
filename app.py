@@ -344,6 +344,7 @@ def add_copy_script():
     """, unsafe_allow_html=True)
 
 # Main Streamlit app
+# Main Streamlit app
 def main():
     # Check for redirection first before setting up the main app
     # Get query parameters using the new API
@@ -388,16 +389,37 @@ def main():
             # Show only the redirection message
             st.markdown("<h2 style='text-align: center;'>Redirecting to long URL...</h2>", unsafe_allow_html=True)
             
-            # Add the actual redirection
+            # Add the improved redirection with error handling, timeout, and analytics consideration
             st.markdown(f"""
     <script>
-        window.location.replace("{original_url}");
+        // Capture analytics event if needed (example placeholder)
+        function logRedirect() {{
+            console.log("Redirect logged");
+            // Add your analytics code here if needed
+            return true;
+        }}
+        
+        // Execute redirect with short timeout to allow analytics
+        try {{
+            logRedirect();
+            setTimeout(function() {{
+                try {{
+                    window.location.replace("{original_url}");
+                }} catch (e) {{
+                    console.error("Redirection failed:", e);
+                    // Fallback to basic approach if replace fails
+                    window.location.href = "{original_url}";
+                }}
+            }}, 100); // Short delay for analytics
+        }} catch (e) {{
+            // Final fallback
+            window.location.href = "{original_url}";
+        }}
     </script>
     <noscript>
         <meta http-equiv="refresh" content="1; URL='{original_url}'">
     </noscript>
 """, unsafe_allow_html=True)
-
             
             # Add a fallback link
             st.markdown(f"<div style='text-align: center;'><a href='{original_url}'>Click here if not redirected automatically</a></div>", unsafe_allow_html=True)
@@ -683,6 +705,5 @@ def main():
                 st.info("No URLs to manage")
         elif admin_password:
             st.error("Incorrect password")
-
 if __name__ == "__main__":
     main()
